@@ -12,7 +12,7 @@ const PreferencesSchema = new mongoose.Schema({
     },
     testTypes : {
         type: [String],
-        required: false, // Advanced todo
+        required: false, // Not needed yet
     }
 })
 

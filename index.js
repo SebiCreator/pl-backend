@@ -1,3 +1,5 @@
+const { Server } = require("socket.io");
+const http = require('http')
 const express = require('express');
 const mongoose = require('mongoose');
 const mongodbService = require('./mongodbService');
@@ -5,6 +7,25 @@ const mongodbService = require('./mongodbService');
 
 const app = express();
 app.use(express.json());    
+const server = http.createServer(app)
+const io = new Server(server,{
+    cors: {
+        origin: "http://localhost:8080"
+    }
+})
+
+
+io.on('connection', (socket) => {
+    console.log('socket.id', socket.id)
+    socket.on('changeMessage', (msg) => {
+        socket.broadcast.emit('changeMessage', msg)
+    })
+    socket.on('message', (msg) => {console.log(msg)})
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    })
+})
+
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
@@ -75,6 +96,6 @@ app.get('/health', (req, res) => {
 })
 
 
-app.listen(3000, () => {
+server.listen(3000, () => {
     console.log('Server is running on port 3000');
 })
