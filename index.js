@@ -6,11 +6,12 @@ const mongodbService = require('./mongodbService');
 
 
 const app = express();
-app.use(express.json());    
+app.use(express.json());
 const server = http.createServer(app)
-const io = new Server(server,{
+const io = new Server(server, {
     cors: {
-        origin: "http://localhost:8080"
+        //origin: "http://localhost:8080"
+        origin: "*"
     }
 })
 
@@ -20,7 +21,14 @@ io.on('connection', (socket) => {
     socket.on('changeMessage', (msg) => {
         socket.broadcast.emit('changeMessage', msg)
     })
-    socket.on('message', (msg) => {console.log(msg)})
+    socket.on('messageFromExtension', (msg) => {
+        console.log("messageFromExtension:", msg)
+        socket.broadcast.emit('messageToClient', msg)
+    })
+    socket.on('messageFromClient', (msg) => {
+        console.log("messageFromClient:", msg)
+        socket.broadcast.emit('messageToExtension', msg)
+    })
     socket.on('disconnect', () => {
         console.log('user disconnected');
     })
@@ -36,55 +44,59 @@ const database = 'pl-backend';
 
 const connection = `mongodb://${host}:${port}/${database}`;
 
-mongoose.connect(connection, )
-  .then(res => console.log("Server connected to MongoDB"))
-  .catch(err => console.error("Error connecting to MongoDB:", err));
+mongoose.connect(connection,)
+    .then(res => console.log("Server connected to MongoDB"))
+    .catch(err => console.error("Error connecting to MongoDB:", err));
 
-app.post('/user', async (req, res) => {
+app.post('/users', async (req, res) => {
     const { email, name, age, motivation, occupation } = req.body;
+    console.log(req.body)
     const result = mongodbService.createUser({ email, name, age, motivation, occupation });
     result ? res.send("Success") : res.send("Failed");
 })
 
-app.patch('/user', async (req, res) => {
+app.patch('/users', async (req, res) => {
     const result = await mongodbService.changeUserByEmail(req.body);
     result ? res.send("Success") : res.send("Failed");
 })
 
-app.get('/user', async (req, res) => {
+app.get('/users', async (req, res) => {
     const { email } = req.query;
-    console.log(email);
-    const result = await mongodbService.getUserByEmail({ email});
-    result  ? res.json(result) : res.send("Failed");
+    console.log("e:", email);
+    const result = await mongodbService.getUserByEmail({ email });
+    result ? res.json(result) : res.send("Failed");
 })
 
-app.post('/goal', async (req, res) => {
-    const { userEmail, topic, focus, subgoals, done, lastChanged } = req.body;
-    const result = await mongodbService.createGoals({ userEmail, topic, focus, subgoals, done, lastChanged });
+app.post('/goals', async (req, res) => {
+    const { email, topic, focus, subgoals, done, lastChanged } = req.body;
+    console.log(req.body)
+    const result = await mongodbService.createGoals({ email, topic, focus, subgoals, done, lastChanged });
     result ? res.send("Success") : res.send("Failed");
 })
 
-app.patch('/goal', async (req, res) => {
-    const { userEmail, topic, focus, subgoals, done, lastChanged } = req.body;
-    const result = await mongodbService.changeGoalsByEmail({ userEmail, topic, focus, subgoals, done, lastChanged });
+app.patch('/goals', async (req, res) => {
+    const { email, topic, focus, subgoals, done, lastChanged } = req.body;
+    const result = await mongodbService.changeGoalsByEmail({ email, topic, focus, subgoals, done, lastChanged });
     result ? res.send("Success") : res.send("Failed");
 })
 
-app.get('/goal', async (req, res) => {
-    const { userEmail } = req.params
-    const result = await mongodbService.getGoalsByUserEmail({ userEmail });
+app.get('/goals', async (req, res) => {
+    const { email } = req.query
+    const result = await mongodbService.getGoalsByEmail({ email });
     result ? res.json(result) : res.send("Failed");
 })
 
 app.post('/preferences', async (req, res) => {
-    const { userEmail, summary, testTypes } = req.body;
-    const result = await mongodbService.createPreferences({ userEmail, summary, testTypes });
+    const { email, summary, testTypes } = req.body;
+    const result = await mongodbService.createPreferences({ email, summary, testTypes });
     result ? res.send("Success") : res.send("Failed");
 })
 
 app.get('/preferences', async (req, res) => {
-    const { userEmail } = req.params;
-    const result = await mongodbService.getPreferencesByUserEmail({ userEmail });
+    console.log("req.query:", req.query)
+    const { email } = req.query;
+    console.log("email:", email);
+    const result = await mongodbService.getPreferencesByEmail({ email });
     result ? res.json(result) : res.send("Failed");
 })
 

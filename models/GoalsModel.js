@@ -6,6 +6,10 @@ const Subgoal = new mongoose.Schema({
         type: String,
         required: true
     },
+    description: {
+        type: String,
+        required: true
+    },
     testSummary : {
         type: String,
         required: true
@@ -25,7 +29,7 @@ const Subgoal = new mongoose.Schema({
 })
 
 const GoalsSchema = new mongoose.Schema({
-    userEmail: {
+    email: {
         type: String,
         required: true
     },
@@ -47,7 +51,7 @@ const GoalsSchema = new mongoose.Schema({
     },
     lastChanged: {
         type: Date,
-        required: true
+        required: false
     },
 })
 

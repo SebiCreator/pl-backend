@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 
 const PreferencesSchema = new mongoose.Schema({
-    userEmail: {
+    email: {
         type: String,
         required: true
     },
