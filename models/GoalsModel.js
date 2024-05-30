@@ -10,20 +10,20 @@ const Subgoal = new mongoose.Schema({
         type: String,
         required: true
     },
-    testSummary : {
-        type: String,
-        required: true
-    },
-    done: {
-        type: Boolean,
-        required: true
-    },
-    lastChanged: {
-        type: Date,
-        required: true
-    },
-    level: {
+    count: {
         type: Number,
+        required: true
+    },
+    maxCount: {
+        type: Number,
+        required: true
+    },
+    chatSessionId : {
+        type: String,
+        required: false
+    },
+    difficulty : {
+        type: String,
         required: true
     }
 })
@@ -37,21 +37,17 @@ const GoalsSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    focus: {
-        type: [String],
+    description: {
+        type: String,
         required: true
+    },
+    focus: {
+        type: String,
+        required: false
     },
     subgoals: {
         type: [Subgoal],
         required: true
-    },
-    done: {
-        type: Boolean,
-        required: true
-    },
-    lastChanged: {
-        type: Date,
-        required: false
     },
 })
 

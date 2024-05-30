@@ -1,8 +1,33 @@
 const UserModel = require('./models/UserModel');
 const PreferencesModel = require('./models/PreferencesModel');
 const GoalsModel = require('./models/GoalsModel');
-const e = require('express');
+const ChatSessionModel = require('./models/ChatSessionModel');
 
+
+
+
+
+const loadChatSession = async ({ id }) => {
+    try {
+        const result = await ChatSessionModel.findOne({ id });
+        return result || { id, messages: [] };
+    } catch (error) {
+        console.log('Fehler:', error)
+        return null
+    }
+}
+const saveChatSession = async ({ id, messages }) => {
+    const filter = { id }
+    const update = { id, messages }
+    const options = { new: true, upsert: true }
+    try {
+        const result = await ChatSessionModel.findOneAndUpdate(filter, update, options)
+        return true
+    } catch (error) {
+        console.log('Fehler:', error)
+        return false
+    }
+}
 
 
 const createUser = async ({ email, name, age, motivation, occupation, sex, language }) => {
@@ -26,7 +51,7 @@ const changeUserByEmail = async ({ email, name, age, motivation, occupation }) =
     try {
         const result = await UserModel.updateOne(
             { email },
-            { $set: { name: name , age: age, motivation: motivation, occupation: occupation } }
+            { $set: { name: name, age: age, motivation: motivation, occupation: occupation } }
         );
         console.log('Update erfolgreich:', result);
         return result;
@@ -49,9 +74,9 @@ const getUserByEmail = async ({ email }) => {
     }
 }
 
-const createGoals = async ({ email, topic, focus, subgoals, done, lastChanged }) => {
-    const filter = { topic,email }
-    const update = { email , focus, subgoals, done, lastChanged}
+const createGoals = async ({ email, topic, description, focus, subgoals }) => {
+    const filter = { topic, email }
+    const update = { email, focus, description, subgoals }
 
     const options = { new: true, upsert: true }
     try {
@@ -66,12 +91,30 @@ const createGoals = async ({ email, topic, focus, subgoals, done, lastChanged })
     }
 }
 
-const changeGoalsByEmail = async ({ email, topic, focus, subgoals, done, lastChanged }) => {
+const changeSubgoalByEmail = async ({ email, topic,subgoalTopic, count, maxCount, chatSessionId, difficulty }) => {
+    try{
+        const result = await GoalsModel.updateOne({
+            email: email,
+            topic: topic,
+            'subgoals.topic': subgoalTopic,
+        }, {
+            $set: { 'subgoals.$.count': count, 'subgoals.$.maxCount': maxCount, 'subgoals.$.chatSessionId': chatSessionId, 'subgoals.$.difficulty': difficulty }
+        });
+        console.log('Update erfolgreich:', result);
+        return true
+    } catch (error) {
+        console.log('Fehler:', error)
+        return false
+
+    }
+}
+
+const changeGoalsByEmail = async ({ email, topic, focus, description, subgoals }) => {
     try {
         const result = await GoalsModel.updateOne({
             email: email
         }, {
-            $set: { topic: topic, focus: focus, subgoals: subgoals, done: done, lastChanged: lastChanged }
+            $set: { topic: topic, focus: focus, description: description, subgoals: subgoals }
         });
         console.log('Update erfolgreich:', result);
         return true
@@ -95,7 +138,7 @@ const getGoalsByEmail = async ({ email }) => {
     }
 }
 
-const createPreferences = async ({ summary, testTypes, email}) => {
+const createPreferences = async ({ summary, testTypes, email }) => {
     const filter = { email }
     const update = { summary, testTypes, email }
     const options = { new: true, upsert: true }
@@ -113,12 +156,12 @@ const createPreferences = async ({ summary, testTypes, email}) => {
 
 const getPreferencesByEmail = async ({ email }) => {
     try {
-        const result = await PreferencesModel.findOne({ email})
+        const result = await PreferencesModel.findOne({ email })
         console.log('Result:', result)
         return result;
     }
     catch (err) {
-        console.log('Fehler:', err)  
+        console.log('Fehler:', err)
         return null
     }
 }
@@ -132,6 +175,9 @@ module.exports = {
     getUserByEmail,
     getGoalsByEmail,
     getPreferencesByEmail,
+    loadChatSession,
+    saveChatSession,
+    changeSubgoalByEmail
 }
 
 

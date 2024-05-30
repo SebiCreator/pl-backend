@@ -68,15 +68,15 @@ app.get('/users', async (req, res) => {
 })
 
 app.post('/goals', async (req, res) => {
-    const { email, topic, focus, subgoals, done, lastChanged } = req.body;
+    const { email, topic, description, focus, subgoals } = req.body;
     console.log(req.body)
-    const result = await mongodbService.createGoals({ email, topic, focus, subgoals, done, lastChanged });
+    const result = await mongodbService.createGoals({ email, topic, description, focus, subgoals });
     result ? res.send("Success") : res.send("Failed");
 })
 
 app.patch('/goals', async (req, res) => {
-    const { email, topic, focus, subgoals, done, lastChanged } = req.body;
-    const result = await mongodbService.changeGoalsByEmail({ email, topic, focus, subgoals, done, lastChanged });
+    const { email, topic, description, focus, subgoals } = req.body;
+    const result = await mongodbService.changeGoalsByEmail({ email, topic, description, focus, subgoals });
     result ? res.send("Success") : res.send("Failed");
 })
 
@@ -98,6 +98,23 @@ app.get('/preferences', async (req, res) => {
     console.log("email:", email);
     const result = await mongodbService.getPreferencesByEmail({ email });
     result ? res.json(result) : res.send("Failed");
+})
+
+app.get('/chatSession', async (req, res) => {
+    const { id } = req.query;
+    const result = await mongodbService.loadChatSession({ id })
+    result ? res.json(result) : res.send("Failed");
+})
+app.post('/chatSession', async (req, res) => {
+    const { id, messages } = req.body;
+    const result = await mongodbService.saveChatSession({ id, messages })
+    result ? res.send("Success") : res.send("Failed");
+})
+
+app.post('/subgoal', async (req, res) => {
+    const { email , topic, subgoalTopic, count, maxCount, chatSessionId, difficulty} = req.body;
+    const result = await mongodbService.changeSubgoalByEmail({ email, topic, subgoalTopic, count, maxCount, chatSessionId, difficulty})
+    result ? res.send("Success") : res.send("Failed");
 })
 
 
