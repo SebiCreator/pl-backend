@@ -5,7 +5,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const mongodbService = require('./mongodbService');
 
-
+const docker  = true
 
 const serverPort = process.env.PORT || 3000;
 
@@ -43,10 +43,13 @@ app.get('/', (req, res) => {
 })
 
 const connection = process.env.MONGO_DB_URI;
+const dockerConnection = process.env.MONGO_DB_DOCKER_URI;
 
-console.log("connection:", connection)
 
-mongoose.connect(connection,)
+const conneciton = docker ? dockerConnection : connection;
+
+
+mongoose.connect(conneciton,)
     .then(res => console.log("Server connected to MongoDB"))
     .catch(err => console.error("Error connecting to MongoDB:", err));
 
