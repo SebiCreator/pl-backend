@@ -1,16 +1,19 @@
 const { Server } = require("socket.io");
+require('dotenv').config();
 const http = require('http')
 const express = require('express');
 const mongoose = require('mongoose');
 const mongodbService = require('./mongodbService');
 
 
+
+const serverPort = process.env.PORT || 3000;
+
 const app = express();
 app.use(express.json());
 const server = http.createServer(app)
 const io = new Server(server, {
     cors: {
-        //origin: "http://localhost:8080"
         origin: "*"
     }
 })
@@ -38,11 +41,10 @@ io.on('connection', (socket) => {
 app.get('/', (req, res) => {
     res.send('Hello World!');
 })
-const host = 'localhost';
-const port = '27017';
-const database = 'pl-backend';
 
-const connection = `mongodb://${host}:${port}/${database}`;
+const connection = process.env.MONGO_DB_URI;
+
+console.log("connection:", connection)
 
 mongoose.connect(connection,)
     .then(res => console.log("Server connected to MongoDB"))
@@ -125,6 +127,6 @@ app.get('/health', (req, res) => {
 })
 
 
-server.listen(3000, () => {
-    console.log('Server is running on port 3000');
+server.listen(serverPort, () => {
+    console.log('Server is running on port:\t' + serverPort);
 })
