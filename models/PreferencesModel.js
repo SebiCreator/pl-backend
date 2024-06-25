@@ -10,10 +10,6 @@ const PreferencesSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    testTypes : {
-        type: [String],
-        required: false, // Not needed yet
-    }
 })
 
 module.exports = mongoose.model('Preferences', PreferencesSchema);

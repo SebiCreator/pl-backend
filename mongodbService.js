@@ -4,7 +4,60 @@ const GoalsModel = require('./models/GoalsModel');
 const ChatSessionModel = require('./models/ChatSessionModel');
 
 
+const allUsers = async () => {
+    try {
+        const result = await UserModel.find();
+        return result;
+    } catch (error) {
+        console.log('Fehler:', error)
+        return null
+    }
+}
 
+const allGoals = async () => {
+    try {
+        const result = await GoalsModel.find();
+        return result;
+    } catch (error) {
+        console.log('Fehler:', error)
+        return null
+    }
+}
+
+const allPreferences = async () => {
+    try {
+        const result = await PreferencesModel.find();
+        return result;
+    } catch (error) {
+        console.log('Fehler:', error)
+        return null
+    }
+}
+
+const allSessions = async () => {
+    try {
+        const result = await ChatSessionModel.find();
+        return result;
+    } catch (error) {
+        console.log('Fehler:', error)
+        return null
+    }
+}
+
+const getDBOverview = ( ) => {
+    allSessions()
+        .then(res => console.log('Sessions:', res))
+        .catch(err => console.log('Fehler:', err))
+    allGoals()
+        .then(res => console.log('Goals:', res))
+        .catch(err => console.log('Fehler:', err))
+    allPreferences()
+        .then(res => console.log('Preferences:', res))
+        .catch(err => console.log('Fehler:', err))
+    allUsers()
+        .then(res => console.log('Users:', res))
+        .catch(err => console.log('Fehler:', err))
+}
 
 
 const loadChatSession = async ({ id }) => {
@@ -140,28 +193,31 @@ const getGoalsByEmail = async ({ email }) => {
 
 const createPreferences = async ({ summary, testTypes, email }) => {
     const filter = { email }
-    const update = { summary, testTypes, email }
+    const update = { summary, email }
     const options = { new: true, upsert: true }
     try {
         const result = await PreferencesModel.findOneAndUpdate(filter, update, options)
-        console.log('Result:', result)
+        console.log('Resultyyy:', result)
         return true
 
     }
     catch (err) {
-        console.log('Fehler:', err)
+        console.log('Fehleryyy:', err)
         return false
     }
 }
 
+
 const getPreferencesByEmail = async ({ email }) => {
     try {
+        console.log('Emailxxx:', email)    
         const result = await PreferencesModel.findOne({ email })
-        console.log('Result:', result)
-        return result;
+        console.log('Resultxxx:', result)
+        const text = result ? result.summary : ''
+        return text;
     }
     catch (err) {
-        console.log('Fehler:', err)
+        console.log('Fehlerxxx:', err)
         return null
     }
 }
@@ -177,7 +233,8 @@ module.exports = {
     getPreferencesByEmail,
     loadChatSession,
     saveChatSession,
-    changeSubgoalByEmail
+    changeSubgoalByEmail,
+    getDBOverview
 }
 
 
