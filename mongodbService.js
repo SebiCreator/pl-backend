@@ -86,6 +86,7 @@ const saveChatSession = async ({ id, messages }) => {
 const createUser = async ({ email, name, age, motivation, occupation, sex, language }) => {
     const filter = { email }
     const update = { email, name, age, motivation, occupation, sex, language }
+    console.log('Update:', update)
     const options = { new: true, upsert: true }
     try {
         const result = await UserModel.findOneAndUpdate(filter, update, options)
